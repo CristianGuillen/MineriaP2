@@ -1,7 +1,9 @@
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+
 
 
 
@@ -14,6 +16,8 @@ public class AlgortimoApriori {
     static ArrayList<Integer> countLettersInSplittedArray = new ArrayList<Integer>();
     static ArrayList<String> letters = new ArrayList<String>();
     static ArrayList<String> lettersThatRelate = new ArrayList<String>();
+    static ArrayList<String[]> combinations = new ArrayList<>();
+    static ArrayList<String[]> supportedCombs = new ArrayList<>();
     static ArrayList<String> lettersSelectedAndAmount= new ArrayList<String>();
     static ArrayList<String> allElementSelected= new ArrayList<String>();
     static ArrayList<String>  valuesOfLettersThatRealateSplitted = new ArrayList<>();
@@ -23,24 +27,85 @@ public class AlgortimoApriori {
         System.out.println("************** ALGORITMO A PRIORI PARA HACER ASOCIACIONES **************\n");
         System.out.println("Direccion del archivo:");
         ReadFileFunc();
-        countLettersIntheFile();
-
+        System.out.println("\nSoporte minimo: ");
+        Scanner minimumSupport = new Scanner(System.in);
+        int mSupportValue = minimumSupport.nextInt();
+        System.out.println("\nConfianza minima: ");
+        Scanner minimumConf = new Scanner(System.in);
+        float mConfValue = minimumConf.nextFloat();
+        countLettersIntheFile(mSupportValue);
         String[] arreg;
-        arreg =  listToArray(letters);
+        arreg = listToArray(letters);
         for(String aux : arreg) {
             System.out.println(aux);
         }
         int z =1;
         while(z<=5)
         {
-            printCombination(arreg,letters.size()-1,z);// r es el numero de elementos que tendra la combinacion
+            printCombination(arreg,arreg.length-1,z);// r es el numero de elementos que tendra la combinacion
             z++;
         }
-
-
-
-
         System.out.println(" maximo soporte "+maxim(countLettersInSplittedArray));
+        for (String[] combs: combinations) {
+            for (String ele: combs) {
+                System.out.print(ele+" ");
+            }
+            System.out.printf("=> %d\n",combSupport(combs));
+            if(combSupport(combs)>=mSupportValue)
+                supportedCombs.add(combs);
+        }
+        System.out.println(supportedCombs.size());
+
+        //Sacar Reglas
+        ArrayList<Regla> reglasQueCumplen= new ArrayList<>();
+        for (String[] rawSet: supportedCombs) {
+            String[] realRaw = new String[rawSet.length];
+            System.arraycopy(rawSet,0,realRaw,0,rawSet.length);
+
+            if(realRaw.length>1 && combSupport(realRaw)>=mSupportValue){
+                for(int k=1;k<=(rawSet.length)-1;k++){
+                    printCombination(rawSet,rawSet.length-1,k);
+                    for (String[] antecedente: combinations) {
+                        ArrayList<String> itemset = new ArrayList<>(Arrays.asList(rawSet));
+                        for(int l=0;l<antecedente.length;l++){
+                            if(itemset.contains(antecedente[l]))
+                                itemset.remove(antecedente[l]);
+                        }
+                        String[] itemsetArr = listToArray(itemset);
+                        if(itemset.size()>0 && combSupport(antecedente)>0){
+                            System.out.printf("ANT %s=>%d, CONS %s=>%d = %f\n", Arrays.toString(antecedente),combSupport(antecedente),Arrays.toString(itemsetArr),combSupport(rawSet),(float)combSupport(realRaw)/combSupport(antecedente));
+                            Regla newRegla = new Regla(antecedente,itemsetArr,((float)combSupport(realRaw)/(float)combSupport(antecedente)));
+                            if (newRegla.getConfianza()>=mConfValue && newRegla.getConfianza()<=1)
+                                reglasQueCumplen.add(newRegla);
+                        }
+                    }
+                }
+            }
+        }
+        reglasQueCumplen.sort(new antSort());
+        for(int pls=0;pls<reglasQueCumplen.size();pls++){
+            boolean repetido=false;
+            int pos=-1;
+            for(int work=pls+1;work<reglasQueCumplen.size();pls++){
+                if(Arrays.toString(reglasQueCumplen.get(pls).getAntecedente()).equalsIgnoreCase(Arrays.toString(reglasQueCumplen.get(work).getAntecedente())) && Arrays.toString(reglasQueCumplen.get(pls).getConsecuente()).equalsIgnoreCase(Arrays.toString(reglasQueCumplen.get(work).getConsecuente()))){
+                    repetido=true;
+                    pos=work;
+                    break;
+                }
+                if (repetido){
+                    reglasQueCumplen.remove(pos);
+                    pls--;
+                }
+            }
+        }
+        System.out.println(reglasQueCumplen.size());
+
+        for (Regla regla:reglasQueCumplen) {
+            System.out.printf("Antecedente: %s\n", Arrays.toString(regla.getAntecedente()));
+            System.out.printf("Consecuente: %s\n", Arrays.toString(regla.getConsecuente()));
+            System.out.printf("Confianza: %f\n", regla.getConfianza());
+            System.out.println("-----------------------------------------------");
+        }
         // buscarLetra("a",arrayOfTransactionsSplitted,countLettersInSplittedArray);
     }
     public static String[] listToArray(ArrayList<String> arr)
@@ -54,31 +119,34 @@ public class AlgortimoApriori {
 
     }
 
-    static void combinationUtil(String[] arr, String[] data, int start,
-                                int end, int index, int r)
+    static void combinationUtil(String[] arr, String[] data,
+                                int i, int index, int r)
     {
 
         // Current combination is ready to be printed, print it
         if (index == r)
         {
-            for (int j=0; j<r; j++)
-                System.out.print(data[j]+" ");
-            System.out.println("");
+            String[] newD = new String[r];
+            System.arraycopy(data,0,newD,0,r);
+            combinations.add(newD);
             return;
         }
+        if(i>=arr.length)
+            return;
 
-        // replace index with all possible elements. The condition
-        // "end-i+1 >= r-index" makes sure that including one element
-        // at index will make a combination with remaining elements
-        // at remaining positions
-        for (int i=start; i<=end && end-i+1 >= r-index; i++)
+        data[index]=arr[i];
+        combinationUtil(arr,data,i+1,index+1,r);
+        combinationUtil(arr,data,i+1,index,r);
+
+        /*for (int i=start; i<=end && end-i+1 >= r-index; i++)
         {
             data[index] = arr[i];
             combinationUtil(arr, data, i+1, end, index+1, r);
-
+            if(i>=arr.length-1)
+                return;
             while (arr[i] == arr[i+1])
                 i++;
-        }
+        }*/
     }
 
     // The main function that prints all combinations of size r
@@ -87,9 +155,8 @@ public class AlgortimoApriori {
     {
         // A temporary array to store all combination one by one
         String data[]=new String[r];
-
         // Print all combination using temprary array 'data[]'
-        combinationUtil(arr, data, 0, n-1, 0, r);
+        combinationUtil(arr, data, 0,0,r);
     }
 
 
@@ -161,11 +228,8 @@ public class AlgortimoApriori {
         return maxValue;
     }
 
+    public static void countLettersIntheFile(int mSupportValue){
 
-    public static void countLettersIntheFile(){
-        System.out.println("\nSoporte minimo: ");
-        Scanner minimumSupport = new Scanner(System.in);
-        float mSupportValue = minimumSupport.nextFloat();
         //Scanner highConfidence = new Scanner(System.in);
         //float hcValue = highConfidence.nextFloat();
         //System.out.println("\n"+hcValue);
@@ -190,14 +254,14 @@ public class AlgortimoApriori {
             }
 
             //lettersSelectedAndAmount.add(arrayOfTransactions.get(i)+""+counter);
-           // System.out.println("#"+k++ +" "+arrayOfTransactionsSplitted.get(i)+"=> "+ counter);
+            // System.out.println("#"+k++ +" "+arrayOfTransactionsSplitted.get(i)+"=> "+ counter);
             countLettersInSplittedArray.add(counter);
 
             if(counter>= mSupportValue){
                 lettersThatRelate.add(arrayOfTransactionsSplitted.get(i));
 
             }
-          //  System.out.println("ELements of values that relate splitted: \n"+valuesOfLettersThatRealateSplitted);
+            //  System.out.println("ELements of values that relate splitted: \n"+valuesOfLettersThatRealateSplitted);
 
             //Choose the greater of the repetitions in the letters
             /*
@@ -209,12 +273,52 @@ public class AlgortimoApriori {
             }
             */
         }
-        System.out.println("Letras que cuentan:");
-        System.out.println(lettersThatRelate);
+        //System.out.println("Letras que cuentan:");
+        //System.out.println(lettersThatRelate);
 
         //allElementSelected.addAll(lettersSelectedAndAmount);
 
 
     }
 
+    public static int combSupport(String[] child){
+        int sup=0;
+        ArrayList<String> childlist= new ArrayList<String>(Arrays.asList(child));
+        for(int i=0;i<arrayOfTransactions.size();i++){
+            ArrayList<String> father= new ArrayList<String>(Arrays.asList(arrayOfTransactions.get(i).split(",")));
+            if(father.containsAll(childlist)){
+                sup++;
+            }
+        }
+        return sup;
+    }
+
+    public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list)
+    {
+
+        // Create a new ArrayList
+        ArrayList<T> newList = new ArrayList<T>();
+
+        // Traverse through the first list
+        for (T element : list) {
+
+            // If this element is not present in newList
+            // then add it
+            if (!newList.contains(element)) {
+                newList.add(element);
+            }
+        }
+
+        // return the new list
+        return newList;
+    }
+
+}
+
+class antSort implements Comparator<Regla>
+{
+    @Override
+    public int compare(Regla o1, Regla o2) {
+        return Arrays.toString(o2.getAntecedente()).compareToIgnoreCase(Arrays.toString(o1.getAntecedente()));
+    }
 }
