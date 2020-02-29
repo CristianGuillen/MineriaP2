@@ -16,6 +16,7 @@ public class AlgortimoApriori {
     static ArrayList<String> lettersThatRelate = new ArrayList<String>();
     static ArrayList<String> lettersSelectedAndAmount= new ArrayList<String>();
     static ArrayList<String> allElementSelected= new ArrayList<String>();
+    static ArrayList<String>  valuesOfLettersThatRealateSplitted = new ArrayList<>();
     int SaveValueIni=0;
     public static void main(String[] args) throws IOException {
 
@@ -26,10 +27,21 @@ public class AlgortimoApriori {
 
         String[] arreg;
         arreg =  listToArray(letters);
-        printCombination(arreg,letters.size(),2);// r es el numero de elementos que tendra la combinacion
+        for(String aux : arreg) {
+            System.out.println(aux);
+        }
+        int z =1;
+        while(z<=5)
+        {
+            printCombination(arreg,letters.size()-1,z);// r es el numero de elementos que tendra la combinacion
+            z++;
+        }
+
+
+
 
         System.out.println(" maximo soporte "+maxim(countLettersInSplittedArray));
-       // buscarLetra("a",arrayOfTransactionsSplitted,countLettersInSplittedArray);
+        // buscarLetra("a",arrayOfTransactionsSplitted,countLettersInSplittedArray);
     }
     public static String[] listToArray(ArrayList<String> arr)
     {
@@ -80,6 +92,9 @@ public class AlgortimoApriori {
         combinationUtil(arr, data, 0, n-1, 0, r);
     }
 
+
+
+
     public static void ReadFileFunc() throws IOException {
         String text;
         BufferedReader bufferReadFile = null;
@@ -95,32 +110,37 @@ public class AlgortimoApriori {
         }
         for (String splitt: arrayOfTransactions){
             for(String splitt2 : splitt.split(",")){
-               arrayOfTransactionsSplitted.add(splitt2);
+                arrayOfTransactionsSplitted.add(splitt2);
 
             }
         }
 
-        for (int j = 0; j < arrayOfTransactionsSplitted.size() ; j++) {
-          //System.out.println("#" +i ++ +" "+ arrayOfTransactionsSplitted.get(j));
-        }
-        System.out.println(arrayOfTransactionsSplitted);
+
+        // for (int j = 0; j < arrayOfTransactionsSplitted.size() ; j++) {
+        //System.out.println("#" +i ++ +" "+ arrayOfTransactionsSplitted.get(j));
+        // }
+
+
+        //System.out.println(arrayOfTransactionsSplitted);
+
+
     }
 
-  public static void buscarLetra(String buscar, ArrayList<String> letras,ArrayList<Integer>cant)
-  {
-      for (int i = 0; i<letras.size();i++)
-      {
-          if(buscar.equalsIgnoreCase(letras.get(i)))
-          {
-              System.out.println("La letra "+buscar+ " tiene "+cant.get(i)+ " repeticiones");
-              return;
-          }
+    public static void buscarLetra(String buscar, ArrayList<String> letras,ArrayList<Integer>cant)
+    {
+        for (int i = 0; i<letras.size();i++)
+        {
+            if(buscar.equalsIgnoreCase(letras.get(i)))
+            {
+                System.out.println("La letra "+buscar+ " tiene "+cant.get(i)+ " repeticiones");
+                return;
+            }
          /* else {
               System.out.println("NO SE ENCONTRO LA LETRA");
               return;
           }*/
-      }
-  }
+        }
+    }
 
 
     public static int maxim(ArrayList<Integer> values)
@@ -131,13 +151,13 @@ public class AlgortimoApriori {
         for(int i =0;i<values.size();i++)
         {
 
-           if(values.get(i)>maxValue)
-           {
-               maxValue=values.get(i);
-              // index=i;
-           }
+            if(values.get(i)>maxValue)
+            {
+                maxValue=values.get(i);
+                // index=i;
+            }
         }
-       // return index;
+        // return index;
         return maxValue;
     }
 
@@ -146,9 +166,9 @@ public class AlgortimoApriori {
         System.out.println("\nSoporte minimo: ");
         Scanner minimumSupport = new Scanner(System.in);
         float mSupportValue = minimumSupport.nextFloat();
-       //Scanner highConfidence = new Scanner(System.in);
-       //float hcValue = highConfidence.nextFloat();
-       //System.out.println("\n"+hcValue);
+        //Scanner highConfidence = new Scanner(System.in);
+        //float hcValue = highConfidence.nextFloat();
+        //System.out.println("\n"+hcValue);
         String aux;
         int k=0;
         for(int i=0; i< arrayOfTransactionsSplitted.size() ;i++ ){
@@ -161,31 +181,38 @@ public class AlgortimoApriori {
                 }
                 //for(int x = 0; x<arrayOfTransactionsSplitted.size();x++){
 
-                    if(letters.isEmpty() || !letters.contains(aux)){
-                        letters.add(aux);
-                       // countLettersInSplittedArray.add(counter);
-                       // counter=0;
-                    }
-
-               // }
-
+                if(letters.isEmpty() || !letters.contains(aux)){
+                    letters.add(aux);
+                    // countLettersInSplittedArray.add(counter);
+                    // counter=0;
+                }
 
             }
 
             //lettersSelectedAndAmount.add(arrayOfTransactions.get(i)+""+counter);
-          // System.out.println("#"+k++ +" "+arrayOfTransactionsSplitted.get(i)+"=> "+ counter);
+           // System.out.println("#"+k++ +" "+arrayOfTransactionsSplitted.get(i)+"=> "+ counter);
             countLettersInSplittedArray.add(counter);
 
             if(counter>= mSupportValue){
                 lettersThatRelate.add(arrayOfTransactionsSplitted.get(i));
+
             }
+          //  System.out.println("ELements of values that relate splitted: \n"+valuesOfLettersThatRealateSplitted);
+
             //Choose the greater of the repetitions in the letters
+            /*
+            for(String lettersThatRelateSplitted : lettersThatRelate) {
+                for(String lettersThatRelateSplitted2 : lettersThatRelateSplitted.split(",")) {
+                    valuesOfLettersThatRealteSplitted.add(lettersThatRelateSplitted2);
+                }
 
-
+            }
+            */
         }
         System.out.println("Letras que cuentan:");
         System.out.println(lettersThatRelate);
-        allElementSelected.addAll(lettersSelectedAndAmount);
+
+        //allElementSelected.addAll(lettersSelectedAndAmount);
 
 
     }
