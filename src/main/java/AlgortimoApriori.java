@@ -18,9 +18,9 @@ public class AlgortimoApriori {
     static ArrayList<String> lettersThatRelate = new ArrayList<String>();
     static ArrayList<String[]> combinations = new ArrayList<>();
     static ArrayList<String[]> supportedCombs = new ArrayList<>();
-    static ArrayList<String> lettersSelectedAndAmount= new ArrayList<String>();
-    static ArrayList<String> allElementSelected= new ArrayList<String>();
-    static ArrayList<String>  valuesOfLettersThatRealateSplitted = new ArrayList<>();
+    //static ArrayList<String> lettersSelectedAndAmount= new ArrayList<String>();
+    //static ArrayList<String> allElementSelected= new ArrayList<String>();
+    //static ArrayList<String>  valuesOfLettersThatRealateSplitted = new ArrayList<>();
     int SaveValueIni=0;
     public static void main(String[] args) throws IOException {
 
@@ -29,7 +29,7 @@ public class AlgortimoApriori {
         ReadFileFunc();
         System.out.println("\nSoporte minimo: ");
         Scanner minimumSupport = new Scanner(System.in);
-        int mSupportValue = minimumSupport.nextInt();
+        float mSupportValue = minimumSupport.nextFloat();
         System.out.println("\nConfianza minima: ");
         Scanner minimumConf = new Scanner(System.in);
         float mConfValue = minimumConf.nextFloat();
@@ -138,15 +138,7 @@ public class AlgortimoApriori {
         combinationUtil(arr,data,i+1,index+1,r);
         combinationUtil(arr,data,i+1,index,r);
 
-        /*for (int i=start; i<=end && end-i+1 >= r-index; i++)
-        {
-            data[index] = arr[i];
-            combinationUtil(arr, data, i+1, end, index+1, r);
-            if(i>=arr.length-1)
-                return;
-            while (arr[i] == arr[i+1])
-                i++;
-        }*/
+
     }
 
     // The main function that prints all combinations of size r
@@ -202,10 +194,7 @@ public class AlgortimoApriori {
                 System.out.println("La letra "+buscar+ " tiene "+cant.get(i)+ " repeticiones");
                 return;
             }
-         /* else {
-              System.out.println("NO SE ENCONTRO LA LETRA");
-              return;
-          }*/
+
         }
     }
 
@@ -228,11 +217,8 @@ public class AlgortimoApriori {
         return maxValue;
     }
 
-    public static void countLettersIntheFile(int mSupportValue){
+    public static void countLettersIntheFile(float mSupportValue){
 
-        //Scanner highConfidence = new Scanner(System.in);
-        //float hcValue = highConfidence.nextFloat();
-        //System.out.println("\n"+hcValue);
         String aux;
         int k=0;
         for(int i=0; i< arrayOfTransactionsSplitted.size() ;i++ ){
@@ -263,15 +249,6 @@ public class AlgortimoApriori {
             }
             //  System.out.println("ELements of values that relate splitted: \n"+valuesOfLettersThatRealateSplitted);
 
-            //Choose the greater of the repetitions in the letters
-            /*
-            for(String lettersThatRelateSplitted : lettersThatRelate) {
-                for(String lettersThatRelateSplitted2 : lettersThatRelateSplitted.split(",")) {
-                    valuesOfLettersThatRealteSplitted.add(lettersThatRelateSplitted2);
-                }
-
-            }
-            */
         }
         //System.out.println("Letras que cuentan:");
         //System.out.println(lettersThatRelate);
@@ -296,7 +273,6 @@ public class AlgortimoApriori {
     public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list)
     {
 
-        // Create a new ArrayList
         ArrayList<T> newList = new ArrayList<T>();
 
         // Traverse through the first list
