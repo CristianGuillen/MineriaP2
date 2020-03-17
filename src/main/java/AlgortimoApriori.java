@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,7 +20,6 @@ public class AlgortimoApriori {
     //static ArrayList<String> lettersSelectedAndAmount= new ArrayList<String>();
     //static ArrayList<String> allElementSelected= new ArrayList<String>();
     //static ArrayList<String>  valuesOfLettersThatRealateSplitted = new ArrayList<>();
-    int SaveValueIni=0;
     public static void main(String[] args) throws IOException {
 
         System.out.println("************** ALGORITMO A PRIORI PARA HACER ASOCIACIONES **************\n");
@@ -40,9 +38,9 @@ public class AlgortimoApriori {
             System.out.println(aux);
         }
         int z =1;
-        while(z<=5)
+        while(z<=5) //Esto solo funciona si es un valor constante en las iteraciones. Tenia que ser comparado con el msupportValue
         {
-            printCombination(arreg,arreg.length-1,z);// r es el numero de elementos que tendra la combinacion
+            printCombination(arreg,arreg.length-1,z);
             z++;
         }
         System.out.println(" maximo soporte "+maxim(countLettersInSplittedArray));
@@ -90,7 +88,7 @@ public class AlgortimoApriori {
                 if(Arrays.toString(reglasQueCumplen.get(pls).getAntecedente()).equalsIgnoreCase(Arrays.toString(reglasQueCumplen.get(work).getAntecedente())) && Arrays.toString(reglasQueCumplen.get(pls).getConsecuente()).equalsIgnoreCase(Arrays.toString(reglasQueCumplen.get(work).getConsecuente()))){
                     repetido=true;
                     pos=work;
-                    break;
+                    //break;
                 }
                 if (repetido){
                     reglasQueCumplen.remove(pos);
@@ -141,18 +139,12 @@ public class AlgortimoApriori {
 
     }
 
-    // The main function that prints all combinations of size r
-    // in arr[] of size n. This function mainly uses combinationUtil()
     static void printCombination(String arr[], int n, int r)
     {
-        // A temporary array to store all combination one by one
+
         String data[]=new String[r];
-        // Print all combination using temprary array 'data[]'
         combinationUtil(arr, data, 0,0,r);
     }
-
-
-
 
     public static void ReadFileFunc() throws IOException {
         String text;
@@ -174,11 +166,9 @@ public class AlgortimoApriori {
             }
         }
 
-
         // for (int j = 0; j < arrayOfTransactionsSplitted.size() ; j++) {
         //System.out.println("#" +i ++ +" "+ arrayOfTransactionsSplitted.get(j));
         // }
-
 
         //System.out.println(arrayOfTransactionsSplitted);
 
